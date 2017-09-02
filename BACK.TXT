@@ -1,5 +1,5 @@
  QtGui.QGraphicsView.__init__(self)
-	# alteracao 3
+	# alteracao 5
         self.setGeometry(QtCore.QRect(100, 100, 600, 250))
 
         self.scene = QtGui.QGraphicsScene(self)
