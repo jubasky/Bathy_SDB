@@ -1,0 +1,58 @@
+campos obrigatorios:
+
+IDENTIFICATION --------------------------------------------------:
+dataset_id: texto livre
+dataset_name: por enquanto, assume o valor de dataset_id
+
+WHERE -----------------------------------------------------------:
+west long: dd.dd
+east long: dd.dd
+south lat: dd.dd
+north lat: dd.dd
+
+horiz datum:  codigo epsg (inteiro)
+vert  datum: SDN code (alfanumerico)
+
+min depth: real
+max. depth: real
+
+WHEN -----------------------------------------
+start date: dd/mm/yyyy hh:mm:ss
+end date  : dd/mm/yyyy hh:mm:ss
+time resolution value: inteiro
+time resolution unit : SDN code (alfanumerico)  Automatico
+
+WHAT ------------------------------------------
+parameter: code (MBAN) ---------- fixo
+abstract: texto
+
+HOW ------------------------------------------
+Instrument : lista de codigos
+Platform class: category code (inteiro)
+
+WHO -------------------------------------------
+Point of contact Organisation: SDN code  (SDN.EDMO.xml
+Originator: lista de SDN codes
+
+WHERE TO FIND DATA -------------------------------------------
+distributor: SDN code (inteiro)
+collate centre: SDN code (inteiro)
+data size: inteiro
+data access restriction: SDN code (Alfa)
+
+Cruise/Station ------------------------------------------------
+cruise name: alfanumerico
+cruise id: alfanumerico, por enquanto igual a cruise_name
+Cruise start_date: dd/mm/yyyy igual a start date do WHEN  - Automatico
+
+QUALITY -------------------------------------------------------
+Lista de:
+name : alfa num
+date: dd/mm/yyyy igual a end date do WHEN  - Automatico
+Comment: texto
+Status: true/false
+
+OTHERS ------------------------------------------------
+data format:  lista de codigos alfa - Fixo + Automatico
+revision date: dd/mm/yyyy - Automatico
+

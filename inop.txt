@@ -1,0 +1,9 @@
+self.listWidget_Equip
+self.lineEdit_C_Contacto.setEnabled(False)
+self.lineEdit_C_Origem = extQLineEdit(self)
+self.lineEdit_C_Distrib = extQLineEdit(self)
+self.lineEdit_C_Org = extQLineEdit(self)
+self.lineEdit_C_Contacto.setStyleSheet("background-color: rgb(250, 250, 250); color: rgb(0, 0, 50); border:2px solid rgb(0, 0, 155);")
+self.lineEdit_C_Origem.setStyleSheet("background-color: rgb(250, 250, 250); color: rgb(0, 0, 50); border:2px solid rgb(0, 0, 155);")
+self.lineEdit_C_Distrib.setStyleSheet("background-color: rgb(250, 250, 250); color: rgb(0, 0, 50); border:2px solid rgb(0, 0, 155);")
+self.lineEdit_C_Org.setStyleSheet("background-color: rgb(250, 250, 250); color: rgb(0, 0, 50); border:2px solid rgb(0, 0, 155);")

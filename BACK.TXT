@@ -1,0 +1,12 @@
+ QtGui.QGraphicsView.__init__(self)
+	# alteracao 3
+        self.setGeometry(QtCore.QRect(100, 100, 600, 250))
+
+        self.scene = QtGui.QGraphicsScene(self)
+        self.scene.setSceneRect(QtCore.QRectF())
+
+        self.setScene(self.scene)
+
+        for i in range(8):
+            self.item = QtGui.QGraphicsEllipseItem(i*75, 10, 75, 30)
+            self.scene.addItem(self.item)
