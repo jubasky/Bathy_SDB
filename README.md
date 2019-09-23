@@ -7,7 +7,7 @@ complemented by PostGis extensions for spatial data,
 and the “pgpointcloud” library extension for pointcloud data structures. 
 Each bathymetric record, stored as sets (Pcpatches) of Pointcloud data structures,
 has an associated metadata record describing the campaign/cruise,
-QC, and other attributes.
+QC and other attributes.
 This application was developed in the context of a GIS Master degree
 in the University of Algarve, leveraging the differents skills 
 acquired during the course to produce a useful tool for a 
