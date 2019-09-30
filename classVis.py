@@ -11,9 +11,9 @@ class Vis():
 
         self.nome = nome
         self.cdi = cdi
-        self.id = id
+        self.id =  id
         self.Config = Config('config.ini')
-        print('Vis: cdi=', cdi)
+        print('Vis: cdi, id', cdi,id)
         self.ler_dados()
 
     def ler_dados(self):
@@ -34,18 +34,21 @@ class Vis():
         if self.nome[0:3] == 'pat':
             print 'Patches'
             self.lerPatches()
+        if self.nome[0:3] == 'pts':
+            print 'ptd'
+            self.lerPoints_CDI()
         if self.nome[0:3] == 'Poi':
             print 'points'
-            self.lerPoints()
+            self.lerPoints_CDI_ID()
 
-        x, y, z = np.genfromtxt('c:/MapX/data/3d.csv', delimiter=',', unpack=True, usecols=(0, 1, 2))
-        # x,y,z = np.genfromtxt('c:/data/pts3d.csv',delimiter=';', skiprows=1,unpack=True, usecols=(0,1,3))
-        # x,y,z = np.genfromtxt('c:/data/teste4.csv',delimiter=',', unpack=True, usecols=(0,1,2)
-
+        try:
+            x, y, z = np.genfromtxt('c:/MapX/data/3d.csv', delimiter=',', unpack=True, usecols=(0, 1, 2))
+            # x,y,z = np.genfromtxt('c:/data/pts3d.csv',delimiter=';', skiprows=1,unpack=True, usecols=(0,1,3))
+            # x,y,z = np.genfromtxt('c:/data/teste4.csv',delimiter=',', unpack=True, usecols=(0,1,2)
+        except:
+            print 'classVis: ler_dados() - Erro em np.genfromtxt.'
         #print z
         #print x[0], y[0], z[0]
-
-
 
         xmin = min(x)
         xmax = max(x)
@@ -72,36 +75,39 @@ class Vis():
         # z *= 2
         print('min e max de x,y,z:', xmin, xmax, ymin, ymax, zmin, zmax)
 
-        # definir resolucao dos pontos para visualizacao
-        xi = np.linspace(xmin, xmax,num=200)
-        yi = np.linspace(ymin, ymax,num=200)
-        # print xi, yi
+        # try:
+        #     # definir resolução dos pontos para visualização
+        #     xi = np.linspace(xmin, xmax,num=50)
+        #     yi = np.linspace(ymin, ymax,num=50)
+        #     print 'xi,yi=', xi, yi
+        #     X, Y = np.meshgrid(xi, yi)
+        #     Z = ml.griddata(x, y, z, xi, yi)
+        # except:
+        #     print ' Erro em classVis:Lerdados'
 
-        X, Y = np.meshgrid(xi, yi)
-
-        Z = ml.griddata(x, y, z, xi, yi)
 
         # definir resolucao da grid para visualizacao
-        xig = np.linspace(xmin, xmax,num=20)
-        yig = np.linspace(ymin, ymax,num=20)
+        # try:
+        xig = np.linspace(xmin, xmax,num=50)
+        yig = np.linspace(ymin, ymax,num=50)
         # print xi, yi
         Xg, Yg = np.meshgrid(xig, yig)
         Zg = ml.griddata(x, y, z, xig, yig)
-        # Z*=-1
+                    # Z*=-1
 
         # --------------------------------- VisVis
         f = visvis.gca()
         a = visvis.cla()
         a.cameraType = '2d'
 
-        sobre_elev = abs((xmax-xmin)/(zmax-zmin))*0.2
-        f.daspect = 1,1,sobre_elev # z x 10000
+        sobre_elev = abs((xmax - xmin) / (zmax - zmin)) * 0.2
+        f.daspect = 1, 1, sobre_elev  # z x 10000
         # draped colors
         # print ('Z =',Z)
-        m = visvis.surf(xi,yi,Z)
-        #nm = visvis.grid(xi,yi,Z)
+        m = visvis.surf(xig, yig, Zg)
+        # nm = visvis.grid(xi,yi,Z)
         m.colormap = visvis.CM_JET
-        #nm.colormap = visvis.CM_COOL
+        # nm.colormap = visvis.CM_COOL
         visvis.ColormapEditor(f)
         visvis.colorbar()
 
@@ -113,6 +119,8 @@ class Vis():
         app = visvis.use()
         # NESTE CONTEXTO NÃO É NECESSARIO
         # app.Run()
+        # except:
+            # print ' Erro em classVis:Lerdados'
 
     def lerPesquisa(self):
         print('ler pesquisa')
@@ -205,8 +213,9 @@ class Vis():
             print(a,lista)
             print(n, ' pontos lidos')
 
-    def lerPoints(self):
-        print('classVis: LerPoints')
+    def lerPoints_CDI_ID(self):
+
+        print('classVis: LerPoints_CDI_ID')
         fich_saida = self.Config.Path + '/data/3d.csv'
         print('Path:', self.Config.Path, ' fich_saida:', fich_saida,' nome:', self.nome, ' cdi:', self.cdi, ' id:', self.id)
 
@@ -261,4 +270,66 @@ class Vis():
             print(a,lista)
             print(n, ' pontos lidos')
 
+    def lerPoints_CDI(self):
+
+        print('classVis: LerPoints_CDI')
+        fich_saida = self.Config.Path + '/data/3d.csv'
+        print('Path:', self.Config.Path, ' fich_saida:', fich_saida,' nome:', self.nome, ' cdi:', self.cdi, ' id:', self.id)
+
+        # sql =  "SELECT  f_pontoscdi.id, f_pontoscdi.cdi, "
+        # sql = sql + "f_pontoscdi.pt, f_pontoscdi.z "
+        # sql = sql + "FROM f_pontoscdi(" + str(self.cdi) + ") f_pontoscdi(n, id, cdi, pt, z);"
+
+        # ---------------------------1º passo, criar estrutura de dados em memoria com o resultado da query v_pontos
+        sql = "SELECT f_pontoscdi.n, f_pontoscdi.id,f_pontoscdi.cdi,  "
+        sql = sql + "ST_AsText(ST_SetSRID(f_pontoscdi.pt, 4326)) as geom, f_pontoscdi.z "
+        sql = sql + "FROM f_pontoscdi(" +  str(self.cdi) + ") f_pontoscdi(n, id, cdi, pt, z);"
+
+        db_acess = DB()
+        db_acess.set_connection(self.Config.Conn)
+        db_acess.ligar()
+        ver = db_acess.ler_sql(sql)
+        db_acess.desligar()
+
+        prof_min = -6000.0
+        prof_max = 0.0
+        n = 0
+
+        if len(ver) == 0:
+            print 'n=000000000000000000000000000000000000000000000000000000'
+            print sql
+
+            return
+
+        with open(fich_saida, 'w') as fout:
+            for linha in ver:
+                lista = []
+                a = str(linha)
+                lista = a.split(',')
+                # print lista
+                b = str(lista[3])
+
+                c = b[8:]
+                c = c[:-2]
+                # print c
+                xy = c.split(' ')
+                x = str(xy[0])
+                y = str(xy[1])
+
+                c = lista[4][10:]
+                c = c[:-3]
+                d = str(float(c))
+
+                if prof_max > d:
+                    prof_max = d
+
+                if prof_min < d:
+                    prof_min = d
+
+                fout.write(x + ',' + y + ',' + d + ',' + "'" + str(self.cdi) + "'" + '\n')
+                n+=1
+
+            print('x,y,d:',x,y,d)
+
+            print(n, ' pontos lidos')
 

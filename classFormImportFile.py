@@ -13,7 +13,6 @@ from classConfig import Config
 import time
 import datetime
 
-
 # ------------------------------------------------------ Classe para gerir importação de dados
 class FormImportFile(QtGui.QWidget, Ui_DialogImport):
 
@@ -70,6 +69,7 @@ class FormImportFile(QtGui.QWidget, Ui_DialogImport):
         for n in range(0, n_col-1):
             self.gridLayout.setColumnMinimumWidth(n, 140)
             self.gridLayout.setColumnStretch(n, 0)
+
         self.comboBox_Plataf.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToMinimumContentsLength)
 
         # ------------------------------------------- Criar widgets line edit C (subclass de QLineEdit) com
@@ -154,6 +154,11 @@ class FormImportFile(QtGui.QWidget, Ui_DialogImport):
         self.connect(self.lineEdit_C_Org, QtCore.SIGNAL("clicked()"), self.ler_cbos_entidades)
 
         self.connect(self.cboSep, QtCore.SIGNAL("currentIndexChanged(const QString&)"), self.ler_linhas)
+
+        # --------------------------------------- ferramenta temporaria para testar projecção
+        # --------------------------------------- de coord lat long para cartesianas (metros)
+        # ---------------------------------------- em etrs89
+        # self.connect(self.lineEdit_C_Origem, QtCore.SIGNAL("clicked()"), self.ler_cbos_entidades))
 
         # -------------------------------------- inicialmente, desactivar widgets de introdução de dados
         self.DesactivarWidgets()
@@ -691,16 +696,16 @@ class FormImportFile(QtGui.QWidget, Ui_DialogImport):
             cur = conn.cursor()
             print('ficheiro_formatado ----------->', ficheiro_formatado)
             # ----------------------------------------------------- criar objecto do tipo "file"
-            ff = open(ficheiro_formatado, 'r')
+            ficheiro_bt = open(ficheiro_formatado, 'r')
             # --------------------------------------------------------- inserir ficheiro completo
-            cur.copy_from(ff, 'pontos_temp', columns=('x', 'y', 'z', 'i', 'r', 'g', 'b'), sep=',')
+            cur.copy_from(ficheiro_bt, 'pontos_temp', columns=('x', 'y', 'z', 'i', 'r', 'g', 'b'), sep=',')
             print('Copiar ', ficheiro_formatado, 'para tabela pontos_temp: ------- OK')
         except:
             print('Copiar ', ficheiro_formatado, 'para tabela pontos_temp: ------- ERRO !!')
             importar_ok = False
         finally:
             conn.close()
-            ff.close()
+            ficheiro_bt.close()
 
         tempo_importar_pontos = time.time() - tempo_zero
         print('_____________________________________________ tempo_importar_pontos=', tempo_importar_pontos)
@@ -752,12 +757,12 @@ class FormImportFile(QtGui.QWidget, Ui_DialogImport):
         # ------------------------------ Ler valor de espacamento medio entre pontos para ajustar tamanho dos patches
         self.esp = self.lineEdit_Esp.text()
 
-        # --------------------------------------- esp dado em metros, utilizar UTM 29N para calcular tamanho de celula
-        # 10m de pt a pt -> x 15 = quadrado com 150 m de lado =>  x graus de longitude e latitude (utilizar UTM)
-        # pt a W de Lisboa: 39ºN, 10ºW
+        # ------------------------------------ esp dado em metros, utilizar UTM 29N para calcular tamanho de celula
+        # ----------------- pt a W de Lisboa: 39ºN, 10ºW
         lat_ini = 39.0
         long_ini = -10.0
-        lado = float(self.esp) * 15
+
+        lado = float(self.esp)
         x_lxa, y_lxa = conversor.converter_simples(long_ini,lat_ini,4326,32629)
         x_lxb = x_lxa + lado
         y_lxb = y_lxa + lado

@@ -24,18 +24,29 @@ class IdentifyTool(QgsMapToolIdentify):
             if len(found_features) > 0:
                 feature = found_features[0].mFeature
                 info = []
+                #
+                # prof = str(feature.attribute("prof"))
+                # num_pts = str(feature.attribute("n"))
+                # id_found = str(feature.attribute("id"))
 
-                prof = str(feature.attribute("prof"))
-                num_pts = str(feature.attribute("n"))
-                id_found = str(feature.attribute("id"))
                 cdi_found = str(feature.attribute("cdi"))
+                try:
+                    id_found = str(feature.attribute("id"))
+                except:
+                    pass
 
-                info.append('id=' + id_found)
+
+                # info.append('id=' + id_found)
                 info.append('cdi=' + cdi_found)
-                info.append('prof med.=' + prof)
-                info.append('npts='  + num_pts)
+                # info.append('prof med.=' + prof)
+                # info.append('npts='  + num_pts)
                 # QMessageBox.about(self.window, "Info", "\n".join(info))
-                self.tv.lerPontos(cdi_found, id_found)
+                try:
+                    self.tv.lerPontos(cdi_found, id_found)
+
+                except:
+                    QMessageBox.about(self.window, "Info", "\n".join(info) + "Erro. Verificar valor de id_found!!")
+
                 self.window.refresh()
 
             return
@@ -71,6 +82,15 @@ class IdentifyTool(QgsMapToolIdentify):
                 pass
             finally:
                 pass
+
+            try:
+                codigo_found = str(feature.attribute("cdi"))
+                info.append('cod_cdi=' + codigo_found)
+            except:
+                pass
+            finally:
+                pass
+
             if len(info)>0:
                 QMessageBox.about(self.window, "Info", "\n".join(info))
 

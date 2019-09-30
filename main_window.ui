@@ -11,22 +11,12 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MapX</string>
+   <string>Bathy_SDB</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLineEdit" name="lineEdit_MapInfo">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>32</height>
-         </size>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
@@ -63,7 +53,7 @@
          <widget class="QWidget" name="widget_2" native="true">
           <property name="geometry">
            <rect>
-            <x>20</x>
+            <x>10</x>
             <y>10</y>
             <width>211</width>
             <height>221</height>
@@ -76,23 +66,28 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="pushButton_preview">
-          <property name="text">
-           <string>Preview</string>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_converte">
-          <property name="text">
-           <string>Converter para LL WGS84 </string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
           </property>
-         </widget>
+         </spacer>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_cancel">
           <property name="enabled">
            <bool>true</bool>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
           </property>
           <property name="text">
            <string>Cancelar</string>
@@ -116,7 +111,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>&amp;File</string>
+     <string>&amp;Ficheiro</string>
     </property>
     <addaction name="actionImportXYZ"/>
     <addaction name="actionConfig"/>
@@ -124,27 +119,35 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>&amp;View</string>
+     <string>&amp;Ver</string>
     </property>
     <addaction name="action_GeoSearch"/>
-    <addaction name="actionDataSearch"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
-     <string>&amp;About</string>
+     <string>&amp;Info</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuDatabase">
     <property name="title">
-     <string>&amp;Database</string>
+     <string>&amp;Base de dados</string>
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionNew"/>
     <addaction name="actionEdit"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Fe&amp;rramentas</string>
+    </property>
+    <addaction name="actionExport_Metadata"/>
+    <addaction name="actionCorrigir_Metadata"/>
+    <addaction name="actionExtrairXYZ"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDatabase"/>
    <addaction name="menuView"/>
+   <addaction name="menuTools"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -186,7 +189,7 @@
      <normaloff>:/icons/mActionNew.png</normaloff>:/icons/mActionNew.png</iconset>
    </property>
    <property name="text">
-    <string>E&amp;xit</string>
+    <string>&amp;Sair</string>
    </property>
   </action>
   <action name="actionImport">
@@ -219,7 +222,7 @@
      <normaloff>:/icons/mActionExit.png</normaloff>:/icons/mActionExit.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;New</string>
+    <string>&amp;Nova</string>
    </property>
   </action>
   <action name="actionEdit">
@@ -233,7 +236,7 @@
      <normaloff>:/icons/mActionZoomOut.png</normaloff>:/icons/mActionZoomOut.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Connect</string>
+    <string>&amp;Ligar</string>
    </property>
   </action>
   <action name="action_GeoSearch">
@@ -242,7 +245,7 @@
      <normaloff>:/icons/witch.png</normaloff>:/icons/witch.png</iconset>
    </property>
    <property name="text">
-    <string>GeoSearch</string>
+    <string>Pesquisa espacial</string>
    </property>
   </action>
   <action name="actionDataSearch">
@@ -302,7 +305,7 @@
      <normaloff>:/icons/selec_1.png</normaloff>:/icons/selec_1.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Config</string>
+    <string>&amp;Configuração</string>
    </property>
   </action>
   <action name="actionSelect">
@@ -318,6 +321,21 @@
    </property>
    <property name="toolTip">
     <string>Definir área rectg.</string>
+   </property>
+  </action>
+  <action name="actionExport_Metadata">
+   <property name="text">
+    <string>Export Metadata</string>
+   </property>
+  </action>
+  <action name="actionCorrigir_Metadata">
+   <property name="text">
+    <string>Corrigir Metadata</string>
+   </property>
+  </action>
+  <action name="actionExtrairXYZ">
+   <property name="text">
+    <string>ExtrairXYZ</string>
    </property>
   </action>
  </widget>

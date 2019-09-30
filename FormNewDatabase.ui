@@ -6,30 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>600</width>
     <height>500</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>500</width>
+    <width>600</width>
     <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>500</width>
+    <width>600</width>
     <height>500</height>
    </size>
   </property>
   <property name="baseSize">
    <size>
-    <width>500</width>
+    <width>600</width>
     <height>350</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Criar BD</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -110,7 +110,7 @@
     <rect>
      <x>20</x>
      <y>20</y>
-     <width>461</width>
+     <width>571</width>
      <height>281</height>
     </rect>
    </property>
@@ -130,9 +130,9 @@
    <widget class="QLineEdit" name="lineEdit_db">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>370</x>
       <y>20</y>
-      <width>141</width>
+      <width>191</width>
       <height>25</height>
      </rect>
     </property>
@@ -150,9 +150,9 @@
    <widget class="QLineEdit" name="lineEdit_passwd">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>370</x>
       <y>60</y>
-      <width>141</width>
+      <width>191</width>
       <height>25</height>
      </rect>
     </property>
@@ -167,7 +167,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Host</string>
+     <string>Host:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -180,7 +180,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>User</string>
+     <string>User:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -188,25 +188,25 @@
      <rect>
       <x>236</x>
       <y>25</y>
-      <width>60</width>
-      <height>13</height>
+      <width>131</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Database</string>
+     <string>Base de dados inicial:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>233</x>
+      <x>300</x>
       <y>60</y>
       <width>60</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Password</string>
+     <string>Password:</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="textEdit">
@@ -214,7 +214,7 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>441</width>
+      <width>551</width>
       <height>181</height>
      </rect>
     </property>
@@ -223,7 +223,7 @@
   <widget class="QPushButton" name="pushButtonCriar">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>30</x>
      <y>460</y>
      <width>91</width>
      <height>31</height>
@@ -236,7 +236,7 @@
   <widget class="QPushButton" name="pushButtonSair">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>470</x>
      <y>460</y>
      <width>111</width>
      <height>31</height>

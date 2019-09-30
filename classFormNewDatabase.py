@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-# --------- Classe para ligar a base de dados
+#
+# Copyright (C) 2019 Marcos Rosa
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details (http://www.gnu.org/licenses/).
+
+
+
+# ------------------------------------------- Classe para criar nova base de dados,
+# ------------------------------------------- gere a form: FormNewDatabase.py
 from PyQt4 import QtGui
 from PyQt4.QtGui import QMessageBox
 from FormNewDatabase import Ui_FormNewDatabase
@@ -79,11 +96,6 @@ class FormNewDB(QtGui.QWidget, Ui_FormNewDatabase):
         finally:
             self.textEdit.append(t1)
             conn.close()
-
-        # self.repaint()
-        # if erro:
-        #     QMessageBox.about(self, u'Criar BD', u'Erro ao criar BD' + nova)
-        #     return
 
         # -----------------------------------------------------------------  Construir strConnect para nova BD
         str_connect="dbname='" + nova + "' user='" + str_User + "' host='" + str_Host + "' password='" \
@@ -326,7 +338,7 @@ class FormNewDB(QtGui.QWidget, Ui_FormNewDatabase):
 
         self.repaint()
 
-        if erro:
+        if erro is True:
             QMessageBox.about(self, u'Criar BD', u'Erro a criar tabela "datum_h" '
                                                  u'a partir de ' + ficheiro + ' ' + str(e))
             return
@@ -356,6 +368,11 @@ class FormNewDB(QtGui.QWidget, Ui_FormNewDatabase):
 
         self.repaint()
 
+        if erro is True:
+            QMessageBox.about(self, u'Criar BD', u'Erro a criar tabela "datum_v" '
+                                                 u'a partir de ' + ficheiro + ' ' + str(e))
+            return
+
         # -------------------------------------------------------------------  Tabela Formato
         t1 = u"Tabela: formato. --- >"
         conn = None
@@ -378,14 +395,11 @@ class FormNewDB(QtGui.QWidget, Ui_FormNewDatabase):
             self.textEdit.append(t1)
 
         self.repaint()
-        if erro:
-            QMessageBox.about(self, u'Criar BD', u'Erro a criar tabela "entidade"'
-                                                 u' a partir de ' + ficheiro + ' ' + str(e))
-            return
 
-        if erro:
-            QMessageBox.about(self, u'Criar BD', u'Erro a criar tabela "datum_v" '
+        if erro is True:
+            QMessageBox.about(self, u'Criar BD', u'Erro a criar tabela "formato" '
                                                  u'a partir de ' + ficheiro + ' ' + str(e))
+            return
 
         else:
             self.textEdit.append(u'Importação de tabelas --> OK.')

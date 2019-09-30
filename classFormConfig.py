@@ -13,6 +13,7 @@ class FormConfig(QtGui.QDialog, Ui_FormConfig):
     def __init__(self, parent = None):
         QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
+
         self.pathConfig = 'config.ini'
 
         # --------------------------------------------------- Ler constantes a partir de config.ini

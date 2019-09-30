@@ -13,7 +13,6 @@ class WLerPontos(QtCore.QObject):
     def __init__(self, cdi):
         QtCore.QObject.__init__(self)
 
-
         if cdi <= 0:
             raise ValueError('Esperado: inteiro >0, recebido: {} '.format(cdi))
 
@@ -27,11 +26,27 @@ class WLerPontos(QtCore.QObject):
         ret = None
         conn = None
         try:
-            # extrair pontos xyz_i_rgb da tabela patches
+            # extrair pontos xyz da tabela patches
             total_pontos = 0
-            # str_connect = "dbname='teste' user='postgres' host='localhost' password='juba'"
-            # print str_connect
+
             tempo1 = time.time()
+            # ------------------- Lê dados da tabela patches_info correspondentes ao registo seleccionado
+            conn = psycopg2.connect(self.Config.Conn)
+            conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            cur = conn.cursor()
+            prof_max = -6000
+            prof_min = 20
+            nome_dataset = ''
+            sql = 'select codigo from patches_info where id=' + str(self.cdi) + ';'
+            print "sql=" + sql
+
+            cur.execute(sql)
+            resultado = cur.fetchall()
+
+            if len(resultado) > 0:
+                nome_dataset = resultado[0][0]
+
+            conn.close()
 
             conn = psycopg2.connect(self.Config.Conn)
             conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -56,18 +71,21 @@ class WLerPontos(QtCore.QObject):
 
             if self.killed is True:
                 return
-            strTemp = self.Config.Path + "/data/pts_"
-            writer = QgsVectorFileWriter.writeAsVectorFormat(lyrPontos, r"" + strTemp + str(self.cdi) + ".shp",
+
+            strTemp = self.Config.Path + "/data/pts_" + nome_dataset
+            writer = QgsVectorFileWriter.writeAsVectorFormat(lyrPontos, r"" + strTemp  + ".shp",
                                                              "utf-8", None, "ESRI Shapefile")
-            shapefile = strTemp + str(self.cdi) + ".shp"
+
+            shapefile = strTemp  + ".shp"
             print('classWlerPontos: gravada shapefile ' + shapefile)
 
             if self.killed is False:
                 ret = shapefile
 
         except Exception, e:
-            # emitir erro de volta para objecto qe pediu o serviço
+            # emitir erro de volta para objecto que pediu o serviço
             self.error.emit(e, traceback.format_exc())
+            print e.message
 
         self.finished.emit(ret)
 

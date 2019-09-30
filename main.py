@@ -1,4 +1,16 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2015-2019 Marcos Rosa
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details (http://www.gnu.org/licenses/).
 
 # --------------------------------- módulo correspondente à gestão do programa principal e da
 # --------------------------------- respectiva janela, Ui_Main_Window
@@ -26,6 +38,10 @@ from classRectangle import RectangleMapTool
 from classPanTool import PanTool
 from classConfig import Config
 from classFormConfig import FormConfig
+from classExportMetadata import ExportMetadata
+from classCorrigirMetadata import CorrigeMetadata
+from classExtrairXYZ import ExtractXYZ
+
 # ----------------------------------------------------- importar ícones, etc.
 import resources
 
@@ -55,7 +71,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.lblScale.setMinimumWidth(140)
         self.ui.statusbar.addPermanentWidget(self.ui.lblScale, 0)
 
-        # --------------------------------------------------- inicializar atributos da class
+        # --------------------------------------------------- inicializar atributos da classe
         self.janela = None
         self.filename = ""
         self.file_epsg = ""
@@ -67,7 +83,7 @@ class StartQT4(QtGui.QMainWindow):
         self.lista_cdis_lidos = []
         self.lista_cdis_activos = []
         self.layers = []
-        # ---------------------------------------------------- criar canvas (mapa)
+        # ---------------------------------------------------- Criar canvas (mapa)
         self.canvas = self.ui.widget
         self.canvas.useImageToRender(False)
         self.canvas.cacheMode = True
@@ -99,7 +115,7 @@ class StartQT4(QtGui.QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, self.LegendDock)
 
         # ----------------------------------------------------------- definir menu de contexto para TreeView
-        self.provider = TreeVMenuProvider(self.view, self.canvas)
+        self.provider = TreeVMenuProvider(self.ui, self.view, self.canvas)
         self.view.setMenuProvider(self.provider)
         # -----------------------------------------------------------------------------------------
         # ------------------------  ligação de "sinais" da UI a "slots" da classe
@@ -109,15 +125,14 @@ class StartQT4(QtGui.QMainWindow):
         QtCore.QObject.connect(self.ui.actionConnect, QtCore.SIGNAL("activated()"), self.Connect_dialog)
         QtCore.QObject.connect(self.ui.actionNew, QtCore.SIGNAL("activated()"), self.CriarDB)
         QtCore.QObject.connect(self.ui.actionConfig, QtCore.SIGNAL("activated()"), self.Config)
+        QtCore.QObject.connect(self.ui.actionExport_Metadata, QtCore.SIGNAL("activated()"), self.ExportarMetadata)
+        QtCore.QObject.connect(self.ui.actionCorrigir_Metadata, QtCore.SIGNAL("activated()"), self.CorrigirMetadata)
+        QtCore.QObject.connect(self.ui.actionExtrairXYZ, QtCore.SIGNAL("activated()"), self.ExtrairXYZ)
 
         # ------------------------------------------------------------------------------- Mouse move
         self.connect(self.canvas, SIGNAL("xyCoordinates(QgsPoint)"), self.mostrarXY)
         self.connect(self.canvas, SIGNAL("scaleChanged(double)"), self.mostrarEscala)
 
-
-        # ----------------------------------------------------------------------------- Botões
-        self.ui.pushButton_converte.clicked.connect(self.CriarDB)
-        self.ui.pushButton_preview.clicked.connect(Preview)
 
         # --------------------------------------------------------- Activar identify tool & pan tool
         self.IdentifyTool = IdentifyTool(self.canvas, self.provider)
@@ -136,8 +151,7 @@ class StartQT4(QtGui.QMainWindow):
         # --------------------------------------------------------- mostrar mapas + patches
         self.provider.MostrarMapa()
 
-    # ----------------------------------- resposta a click no botão Preview
-
+    # ----------------------------------- resposta a click no botão ZoomIn
     def zoomIn(self):
         self.canvas.zoomIn()
 
@@ -179,6 +193,29 @@ class StartQT4(QtGui.QMainWindow):
         self.janela = FormConfig()
         self.janela.show()
 
+    def ExtrairXYZ(self):
+        # -------------  Abrir janela para definir extracção de xyz a partir de ficheiro dxf
+        print('ExtrairXYZ ------------------')
+        self.janela = None
+        self.janela = ExtractXYZ()
+        self.janela.show()
+
+    def ExportarMetadata(self):
+        # -------------  Abrir janela para definir exportação de metadados de levantamentos
+        # -------------  incluindo poligono Bounding Box ou "track lines"
+        print('ExportMetadata ------------------')
+        self.janela = None
+        self.janela = ExportMetadata()
+        self.janela.show()
+
+    def CorrigirMetadata(self):
+        # -------------  Abrir janela para correcção de metadados de levantamentos
+        # -------------  Quality Indexes
+        print('CorrigirMetadata ------------------')
+        self.janela = None
+        self.janela = CorrigeMetadata()
+        self.janela.show()
+
     def File_Input(self):
         # --------------------------  Carregar classe/janela de importação de dados
         self.janela = None
@@ -198,13 +235,6 @@ class StartQT4(QtGui.QMainWindow):
         self.janela = FormNewDB()
         self.janela.show()
 
-def Preview():
-    print('preview')
-    print('---------------------------------')
-    for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-        a = layer.name()
-        print(a)
-    print('---------------------------------')
 
 # ----------------------------------------------------------------------------------------
 # -------------------------------------------------- Main --------------------------------
@@ -216,7 +246,9 @@ if __name__ == '__main__':
     Config = Config('config.ini')
     # ---------------------------------------------------- Definir prefixo (path)
     # ---------------------------------------------------- para livrarias PyQGis
-    # QgsApplication.setPrefixPath(os.environ['QGIS_PREFIX_PATH'], True)
+    # LINUX :   QgsApplication.setPrefixPath(os.environ['QGIS_PREFIX_PATH'], True)
+
+    # WINDOWS:
     QgsApplication.setPrefixPath(Config.PathQ, True)
     print('////////////////////////// QgsApplication.setPrefixPath -------->', QgsApplication.prefixPath())
     QgsApplication.initQgis()

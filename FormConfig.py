@@ -2,12 +2,10 @@
 
 # Form implementation generated from reading ui file 'FormConfig.ui'
 #
-# Created: Sun Jan 15 01:42:09 2017
+# Created: Thu Sep 26 14:31:38 2019
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
-#
-#
 
 from PyQt4 import QtCore, QtGui
 
@@ -44,13 +42,13 @@ class Ui_FormConfig(object):
         self.pushButton_Cancel = QtGui.QPushButton(FormConfig)
         self.pushButton_Cancel.setGeometry(QtCore.QRect(290, 460, 93, 28))
         self.pushButton_Cancel.setObjectName(_fromUtf8("pushButton_Cancel"))
-        self.widget = QtGui.QWidget(FormConfig)
-        self.widget.setGeometry(QtCore.QRect(10, 12, 501, 438))
-        self.widget.setObjectName(_fromUtf8("widget"))
-        self.verticalLayout = QtGui.QVBoxLayout(self.widget)
+        self.layoutWidget = QtGui.QWidget(FormConfig)
+        self.layoutWidget.setGeometry(QtCore.QRect(10, 12, 501, 438))
+        self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
+        self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.groupBox = QtGui.QGroupBox(self.widget)
+        self.groupBox = QtGui.QGroupBox(self.layoutWidget)
         self.groupBox.setTitle(_fromUtf8(""))
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.gridLayout = QtGui.QGridLayout(self.groupBox)
@@ -117,10 +115,10 @@ class Ui_FormConfig(object):
         self.lineEdit_QPath.setObjectName(_fromUtf8("lineEdit_QPath"))
         self.gridLayout.addWidget(self.lineEdit_QPath, 6, 1, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
-        self.pushButton_testConn = QtGui.QPushButton(self.widget)
+        self.pushButton_testConn = QtGui.QPushButton(self.layoutWidget)
         self.pushButton_testConn.setObjectName(_fromUtf8("pushButton_testConn"))
         self.verticalLayout.addWidget(self.pushButton_testConn)
-        self.textBrowser = QtGui.QTextBrowser(self.widget)
+        self.textBrowser = QtGui.QTextBrowser(self.layoutWidget)
         self.textBrowser.setMinimumSize(QtCore.QSize(0, 150))
         self.textBrowser.setMaximumSize(QtCore.QSize(16777215, 150))
         self.textBrowser.setObjectName(_fromUtf8("textBrowser"))
@@ -133,8 +131,8 @@ class Ui_FormConfig(object):
 
     def retranslateUi(self, FormConfig):
         FormConfig.setWindowTitle(_translate("FormConfig", "Configuração", None))
-        self.pushButton_Ok.setText(_translate("FormConfig", "OK", None))
-        self.pushButton_Cancel.setText(_translate("FormConfig", "Cancel", None))
+        self.pushButton_Ok.setText(_translate("FormConfig", "&OK", None))
+        self.pushButton_Cancel.setText(_translate("FormConfig", "&Cancelar", None))
         self.label_host.setText(_translate("FormConfig", "Host", None))
         self.label_Port.setText(_translate("FormConfig", "Port", None))
         self.label_Db.setText(_translate("FormConfig", "Base dados", None))

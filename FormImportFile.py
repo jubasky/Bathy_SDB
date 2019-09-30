@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'FormImportFile.ui'
 #
-# Created: Mon Jan 30 23:56:45 2017
+# Created: Fri Sep 27 11:11:32 2019
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -190,10 +190,6 @@ class Ui_DialogImport(object):
         self.label_12 = QtGui.QLabel(self.groupBox)
         self.label_12.setObjectName(_fromUtf8("label_12"))
         self.gridLayout.addWidget(self.label_12, 11, 0, 1, 1)
-        self.lineEdit_Obs = QtGui.QLineEdit(self.groupBox)
-        self.lineEdit_Obs.setMinimumSize(QtCore.QSize(0, 27))
-        self.lineEdit_Obs.setObjectName(_fromUtf8("lineEdit_Obs"))
-        self.gridLayout.addWidget(self.lineEdit_Obs, 10, 4, 1, 1)
         self.lineEdit_Esp = QtGui.QLineEdit(self.groupBox)
         self.lineEdit_Esp.setMinimumSize(QtCore.QSize(0, 27))
         self.lineEdit_Esp.setObjectName(_fromUtf8("lineEdit_Esp"))
@@ -207,11 +203,8 @@ class Ui_DialogImport(object):
         self.comboBox_Acesso.setMinimumSize(QtCore.QSize(0, 25))
         self.comboBox_Acesso.setObjectName(_fromUtf8("comboBox_Acesso"))
         self.gridLayout.addWidget(self.comboBox_Acesso, 9, 3, 1, 1)
-        self.lineEdit_QC = QtGui.QLineEdit(self.groupBox)
-        self.lineEdit_QC.setMinimumSize(QtCore.QSize(0, 27))
-        self.lineEdit_QC.setObjectName(_fromUtf8("lineEdit_QC"))
-        self.gridLayout.addWidget(self.lineEdit_QC, 10, 1, 1, 3)
         self.label_13 = QtGui.QLabel(self.groupBox)
+        self.label_13.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_13.setObjectName(_fromUtf8("label_13"))
         self.gridLayout.addWidget(self.label_13, 11, 2, 1, 1)
         self.comboBox_Feito = QtGui.QComboBox(self.groupBox)
@@ -422,6 +415,15 @@ class Ui_DialogImport(object):
         self.comboBox_Plataf.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.comboBox_Plataf.setObjectName(_fromUtf8("comboBox_Plataf"))
         self.gridLayout.addWidget(self.comboBox_Plataf, 3, 4, 1, 1)
+        self.lineEdit_QC = QtGui.QLineEdit(self.groupBox)
+        self.lineEdit_QC.setMinimumSize(QtCore.QSize(0, 27))
+        self.lineEdit_QC.setLocale(QtCore.QLocale(QtCore.QLocale.Portuguese, QtCore.QLocale.Portugal))
+        self.lineEdit_QC.setObjectName(_fromUtf8("lineEdit_QC"))
+        self.gridLayout.addWidget(self.lineEdit_QC, 10, 1, 1, 2)
+        self.lineEdit_Obs = QtGui.QLineEdit(self.groupBox)
+        self.lineEdit_Obs.setMinimumSize(QtCore.QSize(0, 27))
+        self.lineEdit_Obs.setObjectName(_fromUtf8("lineEdit_Obs"))
+        self.gridLayout.addWidget(self.lineEdit_Obs, 10, 3, 1, 2)
         self.verticalLayout.addWidget(self.groupBox)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
@@ -498,11 +500,11 @@ class Ui_DialogImport(object):
         self.radioButton_neg.setText(_translate("DialogImport", "Neg.", None))
         self.label_23.setText(_translate("DialogImport", "Acesso:", None))
         self.label_12.setText(_translate("DialogImport", "Profundidade: ", None))
-        self.lineEdit_Esp.setText(_translate("DialogImport", "0.05", None))
-        self.label_13.setText(_translate("DialogImport", "Espaçamento medio (ºLL):", None))
+        self.lineEdit_Esp.setText(_translate("DialogImport", "20", None))
+        self.label_13.setText(_translate("DialogImport", "Dim. patch  (m):", None))
         self.checkBoxLong.setText(_translate("DialogImport", "auto Long W / E", None))
         self.label_21.setText(_translate("DialogImport", "Distribuidor / Organizador:", None))
-        self.label_25.setText(_translate("DialogImport", "QC/Obs:", None))
+        self.label_25.setText(_translate("DialogImport", "QC/Obs/Status:", None))
         self.label_20.setText(_translate("DialogImport", "Contacto / Origem :", None))
         self.label_17.setText(_translate("DialogImport", "Resumo:", None))
         self.label_22.setText(_translate("DialogImport", "Tam. MB:", None))
@@ -519,7 +521,7 @@ class Ui_DialogImport(object):
         self.checkBoxProf.setText(_translate("DialogImport", "auto Prof Max / Min", None))
         self.checkBoxLLat.setText(_translate("DialogImport", "auto Lat N / S", None))
         self.pushButtonAddParam.setText(_translate("DialogImport", "Adic. Parametro", None))
-        self.sairButton.setText(_translate("DialogImport", "&Cancel", None))
+        self.sairButton.setText(_translate("DialogImport", "&Cancelar", None))
         self.importButton.setText(_translate("DialogImport", "Importar", None))
         self.actionSair.setText(_translate("DialogImport", "sair", None))
         self.actionSair.setToolTip(_translate("DialogImport", "Sair", None))

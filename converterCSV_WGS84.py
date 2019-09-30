@@ -2,7 +2,7 @@
 from pyproj import Proj, transform
 
 class ConverterCSV_WGS84:
-    """ Classe para conversão de coordenadas xyzi (valores separados por strSeparador) para longlat wgs84 """
+    """ Classe para conversão de coordenadas xy(valores separados por strSeparador) para longlat wgs84 """
 
     def __init__(self):
         self.ficheiro = ""
@@ -28,13 +28,14 @@ class ConverterCSV_WGS84:
     def set_positivo(self, valor):
         self.positivo = valor
 
+    def projectar(self,longitude, latitude):
+        print ('projectar')
+        return 'projectar'
+
+
     def converter3(self, ignorar_linha, separador, fich_1, epsg_1, fich_2, epsg_2, n1, n2, n3, n4, n5, n6, n7):
 
-        """ Conversão de coordenadas para WGS84 longlat + prof + reflectividade (0 por defeito) + R,G,B """
-
-        # ref. bibliografica:
-        # http://gis.stackexchange.com/questions/78838/how-to-convert-projected-coordinates-to-lat-lon,-using-python
-        # http://stackoverflow.com/questions/8009882/how-to-read-large-file-line-by-line-in-python
+        # ------------------------------------------------------- Conversão de coordenadas para WGS84 longlat
 
         inProj = Proj(init='epsg:' + str(epsg_1))
         outProj = Proj(init='epsg:' + str(epsg_2))
@@ -101,11 +102,15 @@ class ConverterCSV_WGS84:
             else:
                 # dados a importar não estão em WGS84 LL, é necessário converter
                 print('converter 3, n1, n2, n3, n4, n5, n6, n7:', n1, n2, n3, n4, n5, n6, n7)
+
                 with open(fich_1, 'r') as fin:
                     if ignorar_linha > 0:
                         next(fin)
                     for line in fin:
                         variaveis = line.split(separador)
+                        # print 'variaveis', variaveis
+                        # R = raw_input()
+
                         x = float(variaveis[n1])
                         y = float(variaveis[n2])
                         z = float(variaveis[n3])*self.positivo
@@ -140,8 +145,6 @@ class ConverterCSV_WGS84:
                         fout.write(xs + ',' + ys + ',' + zs + ',' + i + ',' + r_color + ',' + g_color + ',' + b_color + '\n')
                         m += 1
                     print(" converter3: convertido de epsg1 para epsg2:", epsg_1, epsg_2)
-
-        # se o ultimo valor de z gravado for positivo, (dados altimetricos, em vez de batimetricos, avisa o utilizador
 
         MaxMin = [self.x_min, self.x_max, self.y_min, self.y_max, self.z_min, self.z_max]
 

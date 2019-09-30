@@ -15,20 +15,21 @@ from classWLerPontos import WLerPontos
 from classConfig import Config
 from classDB import DB
 from classVis import Vis
+from os.path import isfile
+from classFormEdit import FormEdit
 
 
 class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
 
-    def __init__(self, view, window):
+    def __init__(self, principal, view, window):
 
         QgsLayerTreeViewMenuProvider.__init__(self)
         # --------------------------------------------------- Ler constantes a partir de config.ini
         self.Config = Config('config.ini')
-
+        self.principal = principal
         self.view = view
         self.window = window
         self.cdi_anterior = ''
-
         self.num_pesquisas = 0
 
     def createContextMenu(self):
@@ -40,29 +41,382 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         m.addAction("Info", self.showInfo)
         m.addAction("Ver patches E local", self.showPatches)
         m.addAction("Ver patches E global", self.showPatchesGlobal)
-
         m.addAction("Ver pontos", self.showPontosCDI)
+        m.addAction("Exportar pontos", self.exportarPontosCDI)
         m.addAction("Remover", self.removerLayer)
         m.addAction("Reler data", self.reloadLayers)
-        m.addAction("Grid", self.showGrid)
+        # m.addAction("Grid", self.showGrid)
         m.addAction("Apagar", self.apagarLayer)
-        m.addAction("Seleccao", self.seleccao)
+        # m.addAction("Seleccao", self.seleccao)
         m.addAction("3d", self.vis3d)
-
+        m.addAction("XML", self.mostrarXML_fich)
+        m.addAction("Editar", self.editCDI)
 
         return m
 
-    def vis3d(self):
-        iter = self.view.currentLayer().getFeatures()
+
+    def editCDI(self):
+        iter_feat = self.view.currentLayer().getFeatures()
         nm = self.view.currentLayer().name()
-        print nm[0:3]
-        for feature in iter:
+        print "edit  nm",nm[0:3]
+        for feature in iter_feat:
             attrs = feature.attributes()
             cdi = str(attrs[0])
-            id = str(attrs[1])
+            id_code = str(attrs[1])
+            break
+        print "edit  cdi ", cdi,id_code
+
+
+        # --------------------------  Carregar classe/janela de importação de dados
+        self.janela = None
+        self.janela = FormEdit(cdi)
+        self.janela.show()
+
+
+    def vis3d(self):
+        iter_feat = self.view.currentLayer().getFeatures()
+        nm = self.view.currentLayer().name()
+        print nm[0:3]
+        for feature in iter_feat:
+            attrs = feature.attributes()
+            cdi = str(attrs[0])
+            id_code = str(attrs[1])
             break
 
-        b = Vis(nm,cdi,id)
+        if nm[0:3] == 'pts':
+            cdi = int(nm[4:])
+            id_code = 0
+
+        print 'classTV nm, cdi, id', nm, cdi, id_code
+        b = Vis(nm, cdi, id_code)
+
+    def mostrarXML_fich(self):
+        # ------------------------------------------ Ler ficheiro de metadados XML (Emodnet) e mostrar
+        # ------------------------------------------ fiadas ou poligono
+
+        # ------------------------- criar "Dialog" de abertura de ficheiros
+        # ------------------------- para seleccionar "*.xml"
+        fd = QtGui.QFileDialog(self.window)
+        # -------------- preparar filtro para ficheiros do tipo xml
+        a = "Open XML files"
+        b = ''
+        lista = []
+        # -------------- ler ultima localização utilizada (c:/MapX/caminhos/folder_xml.ini)
+        try:
+            f_in = open(self.Config.Path + '/caminhos/folder_xml_in.ini', 'r')
+            for linha in f_in:
+                lista.append(linha)
+            f_in.close()
+
+        except:
+            pass
+
+        if len(lista) > 0:
+            b = lista[0][:len(lista[0])-1]
+            print 'b=', b
+
+        c = "XML Files (*.xml);;All Files (*)"
+        fich_xml = fd.getOpenFileName(self.window, a, b, c)
+        print ("fich_xml = ", fich_xml)
+        mensagem = fich_xml
+
+        # ------------------------------------------- verifica se o path escolhido corresponde a ficheiro válido
+        if not (isfile(fich_xml)):
+            mensagem += u' não corresponde a um ficheiro existente !!!'
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText(mensagem)
+            ret = msgBox.exec_()
+            return
+
+        # ------------------------------------------- se o path escolhido existe, então grava no ficheiro *.ini
+        f_out = open(self.Config.Path + '/caminhos/folder_xml_in.ini', 'w')
+        lista = fich_xml.split('/')
+        lista_b = lista[:len(lista)-2]
+        b = ''
+        for nome in lista_b:
+            b += nome + '/'
+
+        f_out.write(b + '\n')
+        f_out.close()
+
+        # -------------------------------------------------------- actualiza Label com novo path + ficheiro
+        # self.label_Fich_Template.setText(self.filename_template)
+        # self.principal.lineEdit_MapInfo.setText(fich_xml)
+        # ------------------------------------------------ lê fich xml e extrai info de fiadas ou polig
+        lista = fich_xml.split('/')
+        nome_xml = lista[len(lista) - 1]
+        f_in = open(fich_xml, 'r')
+        fich_saida = 'c:/MapX/fiadas.txt'
+        f_saida = open(fich_saida, 'w')
+        n = 0
+        pesquisa = '<gml:Polygon'
+        # lista_poligono = []
+        lista_coord = []
+        id_polig = ''
+        for line in f_in:
+            n += 1
+            str_text = line
+            # ---------------------------------- detectar poligono
+            if str_text.find(pesquisa) > -1:
+                lista_poligono = str_text.split('"')
+                id_polig = lista_poligono[1]
+                print id_polig
+            # ---------------------------------- detectar coordenadas
+            if str_text.find('<gml:posList>') > -1 and id_polig != '':
+                str_aux = str_text.strip('  ')
+                str_aux = str_aux.strip('<gml:posList>')
+                str_aux = str_aux.strip('</gml:posList>\n')
+                lista_coord = str_aux.split(' ')
+                print lista_coord
+
+        f_in.close()
+
+        if id_polig != '':
+            str_wkt = ''
+            m = 0
+            for coord in lista_coord:
+                m +=1
+                str_wkt += str(coord) + ' '
+                if m % 2 == 0:
+                    str_wkt += ', '
+
+            f_saida.write('shape\tcdi\n')
+            str_wkt = str_wkt[0:len(str_wkt)-2]
+            str_wkt = "Polygon ((" + str_wkt + "))\t" + id_polig + "\n"
+            print 'wkt =', str_wkt
+            f_saida.write(str_wkt)
+            f_saida.close()
+            uri = "file:///" + fich_saida + "?delimiter=%s&crs=epsg:4326&wktField=%s" % ("\t", "shape")
+            layer = QgsVectorLayer(uri, nome_xml, "delimitedtext")
+            layer.updateExtents()
+            renderer = self.definirRendererS(True)
+            layer.setRendererV2(renderer)
+            map_layer = QgsMapCanvasLayer(layer)
+            map_layer.setVisible(True)
+            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            self.window.refresh()
+
+            return
+
+        # ----------------------------------------------detectar fiadas (line string)
+        f_in = open(fich_xml, 'r')
+        n = 0
+        pesquisa = '<gml:LineString'
+        lista_fiadas = []
+
+        lista_codigos = []
+        m = 0
+        for line in f_in:
+            n += 1
+            str_text = line
+            # ---------------------------------- detectar line string e extrai id (codigo)
+            if str_text.find(pesquisa) > -1:
+                m += 1
+                lista_temp = str_text.split(':')
+                codigo = lista_temp[2]
+                lista_temp2 = codigo.split('"')
+                codigo = lista_temp2[1]
+                lista_codigos.append(codigo)
+
+            # ---------------------------------- detectar coordenadas
+            if str_text.find('<gml:posList>') > -1:
+                str_aux = str_text.strip('  ')
+                str_aux = str_aux.strip('<gml:posList>')
+                str_aux = str_aux.strip('</gml:posList>\n')
+                lista_coord = str_aux.split(' ')
+                print codigo
+
+                # -------------------------------- acrescenta nova fiada à lista
+                # print lista_coord
+                lista_fiadas.append(lista_coord)
+
+        f_in.close()
+
+        n = 0
+        p = -1
+        f_saida.write('shape\tcdi\n')
+        for lista_c in lista_fiadas:
+            p += 1
+            print lista_codigos[p], lista_c
+            linhas = ''
+            for ponto in lista_c:
+                n += 1
+                if n % 2 == 0:
+                    linhas += ponto + ','
+                else:
+                    linhas += ponto + ' '
+
+            linhas_c = linhas[0:len(linhas) - 1]
+            print 'linha', linhas_c
+            b = "LINESTRING (" + linhas_c + ")\t" + lista_codigos[p] + "\n"
+            f_saida.write(b)
+
+            print 'b=', b
+
+        f_saida.close()
+
+        uri = "file:///" + fich_saida + "?delimiter=%s&crs=epsg:4326&wktField=%s" % ("\t", "shape")
+        layer = QgsVectorLayer(uri, nome_xml, "delimitedtext")
+        layer.updateExtents()
+        renderer = self.definirRendererLineString()
+        layer.setRendererV2(renderer)
+        map_layer = QgsMapCanvasLayer(layer)
+        map_layer.setVisible(True)
+        QgsMapLayerRegistry.instance(self).addMapLayer(layer)
+        self.window.refresh()
+
+
+
+    def mostrarXML(self):
+        # ------------------------------------------ Ler ficheiro de metadados XML (Emodnet) e mostrar
+        # ------------------------------------------ fiadas ou poligono
+
+        # ------------------------- criar "Dialog" de abertura de ficheiros
+        # ------------------------- para seleccionar "*.xml"
+        fd = QtGui.QFileDialog(self.window)
+        # -------------- preparar filtro para ficheiros do tipo xml
+        a = "Open XML files"
+        b = 'c:/MapX/xml/'
+        c = "XML Files (*.xml);;All Files (*)"
+        self.filename_template = fd.getOpenFileName(self.window, a, b, c)
+        print ("self.filename_template=", self.filename_template)
+        mensagem = self.filename_template
+
+        # ------------------------------------------- verifica se o path escolhido corresponde a ficheiro válido
+        if not (isfile(self.filename_template)):
+            mensagem += ' não corresponde a um ficheiro existente !!!'
+            QMessageBox(self, 'Exportar metadados: ', mensagem)
+            return
+
+        # -------------------------------------------------------- actualiza Label com novo path + ficheiro
+        # self.label_Fich_Template.setText(self.filename_template)
+        # self.principal.lineEdit_MapInfo.setText(self.filename_template)
+        # ------------------------------------------------ lê fich xml e extrai info de fiadas ou polig
+        f_in = open(self.filename_template, 'r')
+
+        n = 0
+        pesquisa = '<gml:Polygon'
+        lista_poligono = []
+        lista_coord = []
+        id_polig = ''
+        for line in f_in:
+            n += 1
+            str_text = line
+            # ---------------------------------- detectar poligono
+            if str_text.find(pesquisa) > -1:
+                m = 0
+                lista_poligono = str_text.split('"')
+                id_polig = lista_poligono[1]
+                print id_polig
+            # ---------------------------------- detectar coordenadas
+            if str_text.find('<gml:posList>') > -1 and id_polig != '':
+                str_aux = str_text.strip('  ')
+                str_aux = str_aux.strip('<gml:posList>')
+                str_aux = str_aux.strip('</gml:posList>\n')
+                lista_coord = str_aux.split(' ')
+                print id_polig
+                print lista_coord
+
+        f_in.close()
+
+        if id_polig != '':
+            return
+
+        # ----------------------------------------------detectar fiadas (line string)
+        f_in = open(self.filename_template, 'r')
+
+        n = 0
+        pesquisa = '<gml:LineString'
+        lista_temp = []
+        lista_temp2 = []
+        lista_fiadas = []
+        lista_coord = []
+        super_lista = []
+        dict_fiadas = {}
+        ficheiro_controlo = 'c:/MapX/controlo.txt'
+
+        f_saida = open(ficheiro_controlo, 'w')
+        lista_codigos = []
+        m = 0
+        for line in f_in:
+            n += 1
+            str_text = line
+            # ---------------------------------- detectar line string e extrai id (codigo)
+            if str_text.find(pesquisa) > -1:
+                m += 1
+                lista_temp = str_text.split(':')
+                codigo = lista_temp[2]
+                lista_temp2 = codigo.split('"')
+                codigo = lista_temp2[1]
+                lista_codigos.append(codigo)
+
+            # ---------------------------------- detectar coordenadas
+            if str_text.find('<gml:posList>') > -1:
+                str_aux = str_text.strip('  ')
+                str_aux = str_aux.strip('<gml:posList>')
+                str_aux = str_aux.strip('</gml:posList>\n')
+                lista_coord = str_aux.split(' ')
+                print codigo
+                lista = self.filename_template.split('/')
+                nome_xml = lista[len(lista) - 1]
+                # -------------------------------- acrescenta nova fiada à lista
+                # print lista_coord
+                lista_fiadas.append(lista_coord)
+
+        f_in.close()
+
+        layer = QgsVectorLayer("LineString?crs=EPSG:4326&field=cdi:string",
+                               nome_xml, "memory")
+
+        provider = layer.dataProvider()
+
+        fields = provider.fields()
+        print 'fields=', fields[0]
+
+        features = []
+        prof_min = -13000.0
+        prof_max = 0.0
+        lista_c = []
+        n = 0
+        p = -1
+        for lista_c in lista_fiadas:
+            p += 1
+            print lista_codigos[p], lista_c
+            linhas = ''
+
+            for ponto in lista_c:
+                n += 1
+                if n % 2 == 0:
+                    linhas += ponto + ','
+                else:
+                    linhas += ponto + ' '
+
+            linhas_c = linhas[0:len(linhas) - 1]
+            print 'linha', linhas_c
+            feature = QgsFeature()
+            b = "LINESTRING (" + linhas_c + ")\t"  + lista_codigos[p] + "\n"
+            c = "LINESTRING (" + linhas_c + ")\n"
+            f_saida.write(b)
+
+            print 'b=', c
+
+            feature.setGeometry(QgsGeometry.fromWkt(c))
+            feature.setFields(fields)
+            feature.setAttribute("cdi", lista_codigos[p])
+            features.append(feature)
+
+        f_saida.close()
+        provider.addFeatures(features)
+
+        layer.updateExtents()
+
+        renderer = self.definirRendererLineString()
+        layer.setRendererV2(renderer)
+        map_layer = QgsMapCanvasLayer(layer)
+        map_layer.setVisible(True)
+        QgsMapLayerRegistry.instance().addMapLayer(layer)
+        self.window.refresh()
+
 
 
 
@@ -95,8 +449,6 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
             print('seleccao: cdi, cdi2:', cdi, cdi2)
 
 
-
-
     def apagarLayer(self):
         iter = self.view.currentLayer().getFeatures()
         for feature in iter:
@@ -126,12 +478,10 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
             db_acess = None
 
 
-
     def showGrid(self):
 
         # -------------------------------------------------------- Ler grid da BD e mostrar na tree view
         uri = QgsDataSourceURI()
-
         uri.setConnection(self.Config.Host,self.Config.Port, self.Config.Db, self.Config.User, self.Config.Passwd)
         uri.setDataSource("public", "grid", "geom","", "id")
         lyrGrid = QgsVectorLayer(uri.uri(),  "grid"  , "postgres")
@@ -142,15 +492,73 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         QgsMapLayerRegistry.instance().addMapLayer(lyrGrid)
 
 
+    def lerPontosCDI_ID(self):
+        # - função para ler pontos com cdi e patch_id
+        #  da tabela patches, converter para utm,
+        #  e gravar shapefile
+        #  em MapX\data\pts_cdi_id.shp
+
+        sourceCrs = QgsCoordinateReferenceSystem(4326)
+        destCrs = QgsCoordinateReferenceSystem(32629)
+        tr = QgsCoordinateTransform(sourceCrs, destCrs)
+
+        iter = self.view.currentLayer().getFeatures()
+
+        for feature in iter:
+            attrs = feature.attributes()
+            cdi = int(attrs[0])
+            id = attrs[1]
+            print('classTreeVMenuProvider.lerPontosCDI_ID')
+            geom = feature.geometry()
+            ponto = geom.asPoint()
+            x = ponto.x()
+            y = ponto.y()
+            z = float(attrs[3])
+
+            print('cdi,id,x,y,z=', cdi,id,x,y,z)
+            break
+
+        # --------------- gravar pontos como shapefile
+        _writer = QgsVectorFileWriter.writeAsVectorFormat \
+            (self.view.currentLayer(), self.Config.Path + "/data/patch_points_" + str(cdi) + "_" + str(id) + ".shp", "utf-8", tr, "ESRI Shapefile")
+
+    def exportarPontosCDI(self):
+        # - função para exportar pontos com cdi
+
+        iter = self.view.currentLayer().getFeatures()
+        ficheiro = self.Config.Path + "/export.csv"
+
+        fich = open(ficheiro, 'w')
+
+        print('classTreeVMenuProvider.exportarPontosCDI')
+
+        for feature in iter:
+            attrs = feature.attributes()
+            cdi = int(attrs[0])
+
+            geom = feature.geometry()
+            ponto = geom.asPoint()
+            x = ponto.x()
+            y = ponto.y()
+            z = float(attrs[1])
+
+            fich.write(str(x) +',' + str(y) + ',' + str(z) +'\n')
+
+        fich.close()
+
+
+        print('x,y,z=',  x, y, z)
+
+
     def showPontosCDI(self):
 
         iter = self.view.currentLayer().getFeatures()
         for feature in iter:
             attrs = feature.attributes()
             cdi = int(attrs[0])
+            print('classTreeVMenuProvider.showPontosCDI')
             cdi2 = attrs[1]
         self.ini1 = time.time()
-
         self.lerPontosCDI_DB_Wk(cdi)
 
     # ----------------------------- Função para ler pontos com objecto "thread"
@@ -180,10 +588,33 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         self.thread.deleteLater()
 
         if ret is not None:
+            # ------------------- Lê dados da tabela patches_info correspondentes ao registo seleccionado
+            acessoDB = DB()
+            str_connect = "dbname='" + self.Config.Db + "' user='" + self.Config.User + "' host='" + self.Config.Host + "' password='" \
+                          + self.Config.Passwd + "'"
+
+            acessoDB.set_connection(str_connect)
+            acessoDB.ligar()
+            prof_max = -6000
+            prof_min = 20
+            nome_dataset = ''
+
+            resultado = acessoDB.ler_sql('select prof_max,prof_min, codigo from patches_info where id=' + str(self.cdi))
+            if len(resultado) > 0:
+                prof_max = resultado[0][0]
+                prof_min = resultado[0][1]
+                nome_dataset = resultado[0][2]
+                print 'prof_max, prof_min=', prof_max, prof_min
+
+            acessoDB.desligar()
+
             # ----------------- devolve shapefile criada localmente
             shapefile = ret
-            layerB = QgsVectorLayer(shapefile, "pts_" + str(self.cdi), "ogr")
-            self.applySymbologyFixedDivisionsMarker(layerB,'z')
+            layerB = QgsVectorLayer(shapefile,"pts_" + nome_dataset, "ogr")
+
+
+            self.applySymbologyMinMaxMarker(layerB, prof_max, prof_min, 'z')
+            # self.applySymbologyFixedDivisionsMarker(layerB,'z')
             QgsMapLayerRegistry.instance().addMapLayer(layerB)
             map_layer = QgsMapCanvasLayer(layerB)
             map_layer.setVisible(True)
@@ -195,9 +626,13 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
     def LeitorPontosError(self, e, exception_string):
         print(u' "thread" LeitorPontos  provocou uma excepção ! :\n'.format(exception_string))
 
-    def lerPontos(self, cdi, id):
 
-        # ---------------------------1º passo, criar estrutura de dados em memoria com o resultado da query v_pontos
+    def lerPontos(self, cdi, id):
+        # --------------------------- Método para ler pontos de patch seleccionado pelo utilizador
+        # --------------------------- (rigth-click em patch, no mapa)
+        # --------------------------- Chamado através de objecto do tipo classIdentifyTool
+
+        # ---------------------------1º passo, criar estrutura de dados em memoria com o resultado da função f_pontos
         sql = "SELECT f_pontos.n,  f_pontos.cdi, f_pontos.id, "
         sql = sql + "ST_AsText(ST_SetSRID(f_pontos.pt, 4326)) as geom, f_pontos.z "
         sql = sql + "FROM f_pontos(" + str(cdi) + ", " + str(id) + ") f_pontos(n, id, cdi, pt, z);"
@@ -413,7 +848,6 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
                 self.window.repaint()
 
 
-
     def showPatchesGlobal(self):
         self.modo ='global'
         iter = self.view.currentLayer().getFeatures()
@@ -466,7 +900,6 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
             self.window.refresh()
             self.window.repaint()
 
-
     def MostrarMapa(self):
 
         print('MostrarMapa')
@@ -485,6 +918,7 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         shapefile = self.Config.Path + "/data/ne_50m_admin_0_countries.shp"
         self.lyrMapaVector = QgsVectorLayer(shapefile, "world_vector", "ogr")
         QgsMapLayerRegistry.instance().addMapLayer(self.lyrMapaVector)
+
         # ------------------- identificar todos os datasets presentes na tabela patches
         # ------------------- prever alteração para mostrar a geometria (bounding boxes)
         # ------------------- dos registos de metadados
@@ -549,12 +983,20 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         self.window.refresh()
         self.modo_patches = False
 
+    def definirRendererLineString(self):
+        ColorBlack = QtGui.QColor(0, 0, 0)
+        symbol_ok = QgsLineSymbolV2.createSimple({'penstyle': 'solid','color': 'black','width': '0.2'})
+        symbol_ok.setColor(ColorBlack)
+        myRenderer = QgsSingleSymbolRendererV2(symbol_ok)
+        return myRenderer
+
     def definirRendererP(self, myVectorLayer):
+
         print("myVectorLayer.geometryType=", myVectorLayer.geometryType())
         myTargetField = 'z'
         myRangeList = []
         myOpacity = 1
-        # Make our first symbol and range...
+        # simbolo e "range"
         myMin = -6000.0
         myMax = -3000.0
         myLabel = 'Group 1'
@@ -565,7 +1007,7 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         #mySymbol1.setAlpha(myOpacity)
         myRange1 = QgsRendererRangeV2(myMin, myMax, mySymbol1, myLabel)
         myRangeList.append(myRange1)
-        #now make another symbol and range...
+        # outro  simbolo e range
         myMin = -3000.0
         myMax = 20.0
         myLabel = 'Group 2'
@@ -604,6 +1046,8 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
 
 
         return myRenderer
+
+
 
     def definirRendererPatchesTV(self):
 
@@ -649,7 +1093,6 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
         myRenderer.setClassAttribute(myTargetField)
 
         return myRenderer
-
 
 
     def makeSymbologyForRange(self, layer, min , max, title, color):
@@ -759,7 +1202,7 @@ class TreeVMenuProvider(QgsLayerTreeViewMenuProvider):
 
         layer.setRendererV2(renderer)
 
-    # ----------------------------------- preparar visualização da prof por gradação de cores
+    # ----------------------------------- preparar visualização da profundidade por gradação de cores
     def definirRendererPatches(self):
 
         myStyle = QgsStyleV2().defaultStyle()
